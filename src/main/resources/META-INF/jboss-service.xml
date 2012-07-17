@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <server>
   <mbean code="jp.programmers.jboss.script.ScriptService" name="jboss:service=Script">
+    <attribute name="ScriptDir">${jboss.server.base.dir}/scripts</attribute>
   </mbean>
 </server>

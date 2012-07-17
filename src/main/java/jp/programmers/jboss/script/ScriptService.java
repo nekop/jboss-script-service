@@ -1,16 +1,17 @@
 package jp.programmers.jboss.script;
 
-import java.util.Map;
 import java.io.File;
+import java.io.FileReader;
 import java.util.HashMap;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 public class ScriptService implements ScriptServiceMBean {
 
@@ -26,9 +27,11 @@ public class ScriptService implements ScriptServiceMBean {
                     return new Thread(r, "ScriptServiceThread");
                 }});
     protected ScriptServiceTask task;
-    
+
     public void create() throws Exception {
         log.fine("ScriptService.create()");
+        ScriptEngineManager manager2 = new ScriptEngineManager();
+        System.out.println(manager2.getEngineByExtension("js"));
     }
 
     public void start() throws Exception {
@@ -41,13 +44,13 @@ public class ScriptService implements ScriptServiceMBean {
         if (!dir.exists()) {
             boolean success = dir.mkdirs();
             if (success) {
-                log.log(Level.FINE, "Created scriptDir: %s", scriptDir);
+                log.log(Level.INFO, "Created scriptDir: {0}", scriptDir);
             } else {
-                log.log(Level.WARNING, "Cannot create scriptDir: %s", scriptDir);
+                log.log(Level.WARNING, "Cannot create scriptDir: {0}", scriptDir);
                 throw new IllegalStateException(); // TODO
             }
         } else if (dir.exists() && dir.isFile()) {
-            log.log(Level.WARNING, "The scriptDir: %s is not a directory", scriptDir);
+            log.log(Level.WARNING, "The scriptDir: {0} is not a directory", scriptDir);
             throw new IllegalStateException(); // TODO
         }
         task = new ScriptServiceTask();
@@ -71,7 +74,7 @@ public class ScriptService implements ScriptServiceMBean {
     public String getScriptDir() {
         return scriptDir;
     }
-    
+
     public void setScriptDir(String scriptDir) {
         this.scriptDir = scriptDir;
     }
@@ -87,24 +90,49 @@ public class ScriptService implements ScriptServiceMBean {
             while (isRunning) {
                 // TODO: Scan script dir, detect updated deployments
                 File[] files = dir.listFiles();
+                if (files == null) {
+                    log.log(Level.SEVERE, "Cannot read scriptDir: {0}", scriptDir);
+                    throw new IllegalStateException(); // TODO
+                }
                 for (File f : files) {
                     Long lastModified = fileMap.get(f);
                     if (lastModified == null ||
                         lastModified < f.lastModified()) {
+
                         // Updated, deploy it
-                        if (f.getName().lastIndexOf(".") < 0) {
-                            log.log(Level.WARNING, "The file %s doesn't have a file extension in its name", f.getName());
+                        fileMap.put(f, f.lastModified());
+
+                        String ext = null;
+                        if (f.getName().lastIndexOf(".") > 0 &&
+                            f.getName().lastIndexOf(".") < f.getName().length()) {
+                            ext = f.getName().substring(f.getName().lastIndexOf(".") + 1);
+                        } else {
+                            log.log(Level.WARNING, "The file {0} doesn't have a file extension in its name", f.getName());
                             continue;
                         }
                         ScriptEngine engine =
-                            manager.getEngineByExtension(f.getName());
+                            manager.getEngineByExtension(ext);
                         if (engine == null) {
-                            log.log(Level.WARNING, "Cannot find script engine for file: %s", f.getName());
+                            log.log(Level.WARNING, "Cannot find script engine for file: {0}", f.getName());
                             continue;
                         }
-                        log.log(Level.FINE, "Try to eval file: %s", f.getName());
+                        log.log(Level.FINE, "Try to eval file: {0}", f.getName());
                         // TODO: eval, support lifecycle methods
-                        fileMap.put(f, f.lastModified());
+                        FileReader r = null;
+                        try {
+                            r = new FileReader(f);
+                            engine.eval(r);
+                        } catch (Exception ex) {
+                            log.log(Level.SEVERE, "Try to eval file: {0}", f.getName());
+                            throw new IllegalStateException(); // TODO
+                        } finally {
+                            if (r != null) {
+                                try {
+                                    r.close();
+                                } catch (Exception ignore) { }
+                            }
+
+                        }
                     }
                 }
                 try {
@@ -115,7 +143,7 @@ public class ScriptService implements ScriptServiceMBean {
                 }
             }
             // Clear interrupted status
-            currentThread.interrupted();
+            Thread.interrupted();
         }
     }
 }

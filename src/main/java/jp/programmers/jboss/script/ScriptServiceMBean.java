@@ -9,4 +9,6 @@ public interface ScriptServiceMBean {
     public void stop() throws Exception;
     public void destroy() throws Exception;
 
+    public String getScriptDir();
+    public void setScriptDir(String scriptDir);
 }
