@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -20,7 +21,6 @@ public class ScriptService implements ScriptServiceMBean {
     protected String scriptDir;
     protected long intervalMillis = 3000;
 
-    protected ScriptEngineManager manager = new ScriptEngineManager();
     protected ExecutorService executor =
         Executors.newSingleThreadExecutor(new ThreadFactory() {
                 public Thread newThread(Runnable r) {
@@ -30,8 +30,6 @@ public class ScriptService implements ScriptServiceMBean {
 
     public void create() throws Exception {
         log.fine("ScriptService.create()");
-        ScriptEngineManager manager2 = new ScriptEngineManager();
-        System.out.println(manager2.getEngineByExtension("js"));
     }
 
     public void start() throws Exception {
@@ -95,6 +93,17 @@ public class ScriptService implements ScriptServiceMBean {
                     throw new IllegalStateException(); // TODO
                 }
                 for (File f : files) {
+                    // TODO: Implement ignore file list
+
+                    if (f.getName().startsWith(".") ||
+                        f.getName().endsWith("~") ||
+                        f.getName().endsWith(".tmp") ||
+                        f.getName().endsWith(".bak")) {
+                        // ignore
+                        continue;
+                    }
+                        
+
                     Long lastModified = fileMap.get(f);
                     if (lastModified == null ||
                         lastModified < f.lastModified()) {
@@ -110,25 +119,29 @@ public class ScriptService implements ScriptServiceMBean {
                             log.log(Level.WARNING, "The file {0} doesn't have a file extension in its name", f.getName());
                             continue;
                         }
-                        ScriptEngine engine =
-                            manager.getEngineByExtension(ext);
+                        ScriptEngineManager manager = new ScriptEngineManager();
+                        ScriptEngine engine = manager.getEngineByExtension(ext);
                         if (engine == null) {
                             log.log(Level.WARNING, "Cannot find script engine for file: {0}", f.getName());
                             continue;
                         }
                         log.log(Level.FINE, "Try to eval file: {0}", f.getName());
                         // TODO: eval, support lifecycle methods
-                        FileReader r = null;
+
+                        FileReader reader = null;
                         try {
-                            r = new FileReader(f);
-                            engine.eval(r);
+                            reader = new FileReader(f);
+                            engine.eval(reader);
                         } catch (Exception ex) {
-                            log.log(Level.SEVERE, "Try to eval file: {0}", f.getName());
-                            throw new IllegalStateException(); // TODO
+                            LogRecord record = new LogRecord(Level.SEVERE, "Failed to eval file: {0}");
+                            record.setParameters(new Object[] {f.getName()});
+                            record.setThrown(ex);
+                            log.log(record);
+                            //log.log(Level.SEVERE, "Failed to eval file: {0}", f.getName());
                         } finally {
-                            if (r != null) {
+                            if (reader != null) {
                                 try {
-                                    r.close();
+                                    reader.close();
                                 } catch (Exception ignore) { }
                             }
 
