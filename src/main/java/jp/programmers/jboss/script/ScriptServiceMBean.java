@@ -11,4 +11,7 @@ public interface ScriptServiceMBean {
 
     public String getScriptDir();
     public void setScriptDir(String scriptDir);
+    public long getIntervalMillis();
+    public void setIntervalMillis(long intervalMillis);
+
 }
