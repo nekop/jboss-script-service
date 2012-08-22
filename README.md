@@ -20,5 +20,6 @@ helloworld.js:
 TODO
 ----
 
-* Add other languages support, currently only JavaScript
+* Document how to add other languages support
+* Fix module dependency issue when adding other script languages
 * Allow "service" style scripts that support lifecycle methods and expose as JMX MBean
