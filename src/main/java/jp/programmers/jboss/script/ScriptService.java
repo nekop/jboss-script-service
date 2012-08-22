@@ -97,14 +97,13 @@ public class ScriptService implements ScriptServiceMBean {
         private Map<File, Long> fileMap = new HashMap<File, Long>();
         public void run() {
             File dir = new File(scriptDir);
-            // TODO: Scan script dir, detect updated deployments
             File[] files = dir.listFiles();
             if (files == null) {
                 log.log(SEVERE, "Cannot read scriptDir: {0}", scriptDir);
                 throw new IllegalStateException(); // TODO
             }
             for (File f : files) {
-                // TODO: Implement ignore file list, it's hard-coded
+                // TODO: Implement ignore file list and make it JMX attribute. Right now hard-coded.
                 if (f.getName().startsWith(".") ||
                     f.getName().endsWith("~") ||
                     f.getName().endsWith(".tmp") ||
@@ -116,10 +115,8 @@ public class ScriptService implements ScriptServiceMBean {
                 Long lastModified = fileMap.get(f);
                 if (lastModified == null ||
                     lastModified < f.lastModified()) {
-
                     // Updated, deploy it
                     fileMap.put(f, f.lastModified());
-
                     String ext = null;
                     if (f.getName().lastIndexOf(".") > 0 &&
                         f.getName().lastIndexOf(".") < f.getName().length()) {
@@ -135,8 +132,6 @@ public class ScriptService implements ScriptServiceMBean {
                         continue;
                     }
                     log.log(FINE, "Try to eval file: {0}", f.getName());
-                    // TODO: eval, support lifecycle methods
-
                     FileReader reader = null;
                     try {
                         reader = new FileReader(f);
@@ -146,7 +141,6 @@ public class ScriptService implements ScriptServiceMBean {
                         record.setParameters(new Object[] {f.getName()});
                         record.setThrown(ex);
                         log.log(record);
-                        //log.log(SEVERE, "Failed to eval file: {0}", f.getName());
                     } finally {
                         if (reader != null) {
                             try {
