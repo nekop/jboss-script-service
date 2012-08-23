@@ -16,7 +16,6 @@
       <groupId>jp.programmers.jboss.script</groupId>
       <artifactId>jboss-script-service</artifactId>
       <version>1.0</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.jruby</groupId>
