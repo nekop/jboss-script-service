@@ -1,8 +1,0 @@
-<jboss-deployment-structure>
-  <deployment>
-    <dependencies>
-      <module name="deployment.jruby.jar" optional="true" services="import" />
-      <module name="org.jruby" optional="true" services="import" />
-    </dependencies>
-  </deployment>
-</jboss-deployment-structure>

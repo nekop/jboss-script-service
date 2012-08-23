@@ -3,29 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>jp.programmers.jboss.script</groupId>
-  <artifactId>script-service</artifactId>
-  <name>script-service</name>
-  <version>1.0</version>
+  <parent>
+    <groupId>jp.programmers.jboss.script</groupId>
+    <artifactId>jboss-script-service-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>jboss-script-service</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-  <build>
-    <finalName>${project.artifactId}</finalName>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
 </project>
