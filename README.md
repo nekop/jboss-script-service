@@ -30,3 +30,4 @@ TODO
 ----
 
 * Allow "service" style scripts that support lifecycle methods and expose as JMX MBean
+* Make some useful container objects like MBeanServer available to scripts automatically
