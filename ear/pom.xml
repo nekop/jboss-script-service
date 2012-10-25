@@ -34,6 +34,7 @@
         <configuration>
           <finalName>jboss-script-service</finalName>
           <version>6</version>
+          <generateApplicationXml>false</generateApplicationXml>
           <modules>
             <jarModule>
               <groupId>org.jruby</groupId>
