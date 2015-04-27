@@ -6,12 +6,12 @@
   <groupId>jp.programmers.jboss.script</groupId>
   <artifactId>jboss-script-service-parent</artifactId>
   <name>JBoss AS Script Service</name>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
   <packaging>pom</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.jruby>1.7.13</version.jruby>
+    <version.jruby>1.7.19</version.jruby>
   </properties>
 
   <dependencyManagement>
@@ -19,7 +19,7 @@
       <dependency>
         <groupId>jp.programmers.jboss.script</groupId>
         <artifactId>jboss-script-service</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jruby</groupId>
