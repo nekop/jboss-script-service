@@ -6,7 +6,7 @@ Do you remember bsh deployer service? Now we are JSR-223, javax.script!
 Usage
 -----
 
-Deploy ear/target/jboss-script-service.ear to $JBOSS_HOME/standalone/deployments directory and boot JBoss AS 7.
+Deploy ear/target/jboss-script-service.ear to $JBOSS_HOME/standalone/deployments directory and boot JBoss AS 7 / WildFly.
 
 You'll see $JBOSS_HOME/standalone/scripts directory created and you can deploy any scripts to this directory.
 
